@@ -1,0 +1,35 @@
+Name,Units,Description
+,,
+blades,[-],Number of blades 
+rad_coord,[m],Locations of radial sections on the blade
+twist,[rad],Twist angle at each radial section
+chord,[m],Chord length at each radial section
+,,
+aoa,[rad],Angle of attack
+Cl,[-],Lift force coefficient
+Cd,[-],Drag force coefficient
+Cn,[-],Normal force coefficient
+Cc,[-],Chordwise force coefficient
+aoa_Cl0,[rad],Angle of zero lift
+Cl_lin_slope,[-],Linear lift slope
+Cl_lin_range,[rad],Linear lift angle range
+Cd_Cl0,[-],Drag coefficient at zero lift
+,,
+depth,[m],Water deph from mean mean water level to bed
+hub_depth,[m],Depth of turbine hub centre from mean water level
+TSR,[-],Tip-speed ratio
+yaw,[rad],Yaw angle relative to the freestream and rotor plane
+pitch,[rad],Blade pitch angle
+hub_velocity,[m/s],Mean flow velocity at the hub centre
+shear_law,[-],Power law exponent for depthwise velocity profile
+,,
+waves,[boolean],1 (true): waves are on; 0 (false): waves are off)
+waves_H,[m],Wave height from trough to crest
+wave_T,[s],Wave period
+wave_dir,[rad],Wave direction relative to the freestream
+,,
+turbulence,[boolean],1 (true): turbulence is on; 0 (false): turbulence is off
+turb_spec,[char],Name abreviation of the turbulence specturm used to genertate synthetic turbulence fluctuations
+turb_intensity,[-],Ratio of fluctuations of the freestream velocity
+len_scale,[m],Turbulent length scale
+iso_ratio,[-],Anisotropy ratio (isotropic = 1)
