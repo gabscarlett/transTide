@@ -301,7 +301,7 @@ classdef TidalSim < handle
                 [Cd_US(n,:,:)] = dynStallCd(Dvis, Cd_Ind, obj.grid, squeeze(aE(n,:,:)), obj.RadialCoords, obj.AeroFoil.ZeroLiftDrag);
             end
             
-            obj.LiftCoeff = Cl_US; obj.DragCoeff = Cd_US;
+            obj.LiftCoeff = Cl_US; obj.DragCoeff = zeros(size(Cl_US));%Cd_US;
             
         end
         

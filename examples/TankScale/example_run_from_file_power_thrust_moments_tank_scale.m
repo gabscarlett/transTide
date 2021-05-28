@@ -4,24 +4,24 @@ clear; close all; clc
 % Input data for the turbine, aerofoil and operating conditions are loaded from
 % from a csv file.
 
-% Altering default discretisation settings is demonstrated.
+% Default discretisation settings are changed.
 
-% An example is given to compute the root and edge wise bending moments,
-% and to plot them for a single blade.
+% An example is given to compute and plot the power, thrust and root and edge
+% wise bending moments.
 
 %% set the paths and file names
-myPath = [transTidePath '\data\']; % this is the data path
+myPath = [transTidePath '\data\SupGenTankScale\']; % this is the data path
 
-dataNameTurb = 'turbine_TGL'; 
+dataNameTurb = 'turbine_SupGen'; 
 fileNameTurb = [myPath dataNameTurb]; % details of blade profile
 
-dataNameOps = 'operationalConditions';
+dataNameOps = 'operationalConditions_SupGen';
 fileNameOps = [myPath dataNameOps]; % details of operating conditions (flow and turbine)
 
-dataNameFoil = 'static_aerofoil_S814';
+dataNameFoil = 'static_aerofoil_NACA_63_816';
 fileNameFoil = [myPath dataNameFoil]; % measured aerofoil coefficients with angle of attack
 
-dsData = 'S814_DS_parameters.mat'; % empirical data for dynamic stall model (valid for S814 only)
+dsData = 'NACA_63_816_DS_parameters.mat'; % empirical data for dynamic stall model (valid for S814 only)
 dsFile = [myPath dsData]; % file path for DS data
 
 %% make an AerofoilProps class by passing the file name
@@ -52,19 +52,27 @@ sim = TidalSim(run, foil); % pass the run settings class and aerofol class to si
 
 %% change discretisation settings
 
-sim.BladeSections = 50; % reduce blade dicretisation from 100 to 50 sections
+sim.BladeSections = 20; % for the tank scale device 20 sections are plenty
 sim.Rotations = 50; % reduce the number of simulated rotations from 100 to 50
-sim.Steps = 36; % reduce the steps in each rotation from 72 (5 degrees) to 36 (10 degrees)
 
 %% run a simulation using default settings
 
 sim.RunSimulation; % run the simulation
 
 blade = 1; % blade number to inspect
+
 RootBM = sim.RootBM(blade,:); % root bending moment time series for blade 
 meanRootBM = mean(RootBM); % compute the mean root bending moment
+
 EdgeBM = sim.EdgeBM(blade,:); % root bending moment time series for blade 
 meanEdgeBM = mean(EdgeBM); % compute the mean root bending moment
+
+Power = sum(sim.Power); % sum the power contribution of each plade
+meanPower = mean(Power); % compute the mean power
+
+Thrust = sum(sim.Thrust); % sum the thrust contribution of each plade
+meanThrust = mean(Thrust); % compute the mean thrust
+
 
 %% plot the bending moment time series
 
@@ -73,11 +81,27 @@ t = sim.Time; % get the time array
 figure;
 % plot power
 subplot(1,2,1)
-plot(t, RootBM/1000, 'k', t, meanRootBM/1000*(ones(size(t))), 'k:', 'LineWidth',2)
+plot(t, RootBM, 'k', t, meanRootBM*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
-ylabel('Root bending moment [kNm]')
+ylabel('Root bending moment [Nm]')
 % plot thrust
 subplot(1,2,2)
-plot(t, EdgeBM/1000, 'k', t, meanEdgeBM/1000*(ones(size(t))), 'k:', 'LineWidth',2)
+plot(t, EdgeBM, 'k', t, meanEdgeBM*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
-ylabel('Edge wise bending moment [kNm]')
+ylabel('Edge wise bending moment [Nm]')
+
+%% plot power and thrust time series
+
+t = sim.Time; % get the time array
+
+figure;
+% plot power
+subplot(1,2,1)
+plot(t, Power, 'k', t, meanPower*(ones(size(t))), 'r:', 'LineWidth',2)
+xlabel('Time [s]')
+ylabel('Power [W]')
+% plot thrust
+subplot(1,2,2)
+plot(t, Thrust, 'k', t, meanThrust*(ones(size(t))), 'r:', 'LineWidth',2)
+xlabel('Time [s]')
+ylabel('Thrust [N]')

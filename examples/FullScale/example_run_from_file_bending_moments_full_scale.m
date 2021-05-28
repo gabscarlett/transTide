@@ -4,16 +4,18 @@ clear; close all; clc
 % Input data for the turbine, aerofoil and operating conditions are loaded from
 % from a csv file.
 
-% An example is given to compute the power with and without the effect of
-% rotational augmentation (3D stall delay) accounted for.
+% Altering default discretisation settings is demonstrated.
+
+% An example is given to compute the root and edge wise bending moments,
+% and to plot them for a single blade.
 
 %% set the paths and file names
-myPath = [transTidePath '\data\']; % this is the data path
+myPath = [transTidePath '\data\TGLFullScale\']; % this is the data path
 
 dataNameTurb = 'turbine_TGL'; 
 fileNameTurb = [myPath dataNameTurb]; % details of blade profile
 
-dataNameOps = 'operationalConditions';
+dataNameOps = 'operationalConditions_TGL';
 fileNameOps = [myPath dataNameOps]; % details of operating conditions (flow and turbine)
 
 dataNameFoil = 'static_aerofoil_S814';
@@ -48,44 +50,34 @@ sim = TidalSim(run, foil); % pass the run settings class and aerofol class to si
 % Number of rotations made: 100
 % Steps per revolution: 72 (step size of 5 degrees)
 
+%% change discretisation settings
+
+sim.BladeSections = 50; % reduce blade dicretisation from 100 to 50 sections
+sim.Rotations = 50; % reduce the number of simulated rotations from 100 to 50
+sim.Steps = 36; % reduce the steps in each rotation from 72 (5 degrees) to 36 (10 degrees)
+
 %% run a simulation using default settings
 
 sim.RunSimulation; % run the simulation
 
-Power = sum(sim.Power); % sum the power contribution of each plade
-meanPower = mean(Power); % compute the mean power
+blade = 1; % blade number to inspect
+RootBM = sim.RootBM(blade,:); % root bending moment time series for blade 
+meanRootBM = mean(RootBM); % compute the mean root bending moment
+EdgeBM = sim.EdgeBM(blade,:); % root bending moment time series for blade 
+meanEdgeBM = mean(EdgeBM); % compute the mean root bending moment
 
-Thrust = sum(sim.Thrust); % sum the thrust contribution of each plade
-meanThrust = mean(Thrust); % compute the mean thrust
-
-
-%% re-run the simulation with rotational augmentation
-
-sim.RotationalAugmentation = true; % set rotational augmentation property to true
-sim.RunSimulation; % re-run the simulation
-
-Power_R = sum(sim.Power); % sum the power contribution of each blade
-meanPower_R = mean(Power_R); % compute the mean power
-
-Thrust_R = sum(sim.Thrust); % sum the thrust contribution of each blade
-meanThrust_R = mean(Thrust_R); % compute the mean thrust
-
-
-%% plot the power and thrust time series for each method
+%% plot the bending moment time series
 
 t = sim.Time; % get the time array
 
 figure;
 % plot power
 subplot(1,2,1)
-plot(t, Power/1000, 'b', t, meanPower/1000*(ones(size(t))), 'b:', ...
-    t, Power_R/1000, 'r', t, meanPower_R/1000*(ones(size(t))), 'r:', 'LineWidth',2)
+plot(t, RootBM/1000, 'k', t, meanRootBM/1000*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
-ylabel('Power [kW]')
-legend('Without rotation', 'mean','With rotation', 'mean', 'location', 'best')
+ylabel('Root bending moment [kNm]')
 % plot thrust
 subplot(1,2,2)
-plot(t, Thrust/1000, 'b', t, meanThrust/1000*(ones(size(t))), 'b:', ...
-    t, Thrust_R/1000, 'r', t, meanThrust_R/1000*(ones(size(t))), 'r:', 'LineWidth',2)
+plot(t, EdgeBM/1000, 'k', t, meanEdgeBM/1000*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
-ylabel('Thrust [kN]')
+ylabel('Edge wise bending moment [kNm]')
