@@ -1,40 +1,37 @@
-function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = dynStall(B, c, gridF, r, Cp, Cn_c, Cn_nc, ds, aE, at, file_ds)
+function [Cn_DS, Ct_DS, Cl_DS, Dvis, Cd_Ind, ff, fff, VortexTracker] = dynStallOriginal(B, c, Values_360r, r, Cp, Cn_c, Cn_nc, ds, aE, at, file_ds)
 
 %       DYNAMIC STALL MODULE FOR NON-UNIFORM FORCING
 
 %       Written G.Scarlett, The University of Edinburgh, April 2017
 
-%       Dynamic stall model following Sheng, Galbraith and Cotton
+%       Dynamic stall model following Sheng Glabraith and Cotton
 
 %       Mach effects are ignored.
 
-% load empirical data
-load(file_ds)
 
-% pre-process data
+%%              LOAD DYNAMIC STALL DATA
 
 % determine static separation point for simulation
-if size(gridF.GridVectors,2) == 2
-    rr=r'.*ones(size(at));
-    f = gridF(at, rr);
-    faE = gridF(aE, rr);
-    
-    % angle shift to account for rotational stall delay
-    delta_aRot_ass= 0.25/(2*pi)*1.6.*(c./r).*cos(ass+B).^2;
-    ass=ass+delta_aRot_ass;
-    
-    delta_aRot_ads0= 0.25/(2*pi)*1.6.*(c./r).*cos(ads0+B).^2;
-    ads0=ads0+delta_aRot_ads0;
-else
-    f = gridF(at);
-    faE = gridF(aE);
-end
+rr=r'.*ones(size(at));
+f=interp2(r,Values_360r.Alpha,Values_360r.F,rr,at,'spline');  % spline outside loop
 % !!!! Avoid negative values !!!
 InRange=(f>0);
 f=f.*InRange;
 
+faE=interp2(r,Values_360r.Alpha,Values_360r.F,rr,(aE),'spline');
 InRange=(faE>0);
 faE=faE.*InRange;
+
+load(file_ds)
+
+% angle shift to account for rotational stall delay
+
+delta_aRot_ass= 0.25/(2*pi)*1.6.*(c./r).*cos(ass+B).^2;
+ass=ass+delta_aRot_ass;
+
+delta_aRot_ads0= 0.25/(2*pi)*1.6.*(c./r).*cos(ads0+B).^2;
+ads0=ads0+delta_aRot_ads0;
+
 
 da1=ads0-ass;
                 
@@ -54,15 +51,15 @@ a_cr = ads0';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ela=length(at(1,:)); % original length of AoA
 % lets run many times for numerical convergence
-%for i=1:3
-at=horzcat(at, at, at); % make vector with of 16*AoA length
-f=horzcat(f, f, f); % make vector with of 16*AoA length
-faE=horzcat(faE, faE, faE); % make vector with of 16*AoA length
-aE=horzcat(aE, aE, aE); % make vector with of 16*AoA length
-Cp=horzcat(Cp, Cp, Cp); % same to attached flow solution
-Cn_c=horzcat(Cn_c, Cn_c, Cn_c); % circular component of attached solution
-Cn_nc=horzcat(Cn_nc, Cn_nc, Cn_nc); % non-circular component of attached solution
-%end
+for i=1:3
+at=horzcat(at,at); % make vector with of 16*AoA length
+f=horzcat(f,f); % make vector with of 16*AoA length
+faE=horzcat(faE,faE); % make vector with of 16*AoA length
+aE=horzcat(aE,aE); % make vector with of 16*AoA length
+Cp=horzcat(Cp,Cp); % same to attached flow solution
+Cn_c=horzcat(Cn_c,Cn_c); % circular component of attached solution
+Cn_nc=horzcat(Cn_nc,Cn_nc); % non-circular component of attached solution
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ela2= length(at(1,:));
@@ -89,13 +86,7 @@ for i=2:ela2
             
 %       Determine ff from look up table using lagged angle
           
-         %ff(:,i)=interp2(r',Values_360r.Alpha,Values_360r.F,r',(a_p-da1'),'linear'); % linear inside loop for speed!!
-         
-         if size(gridF.GridVectors,2) == 2
-            ff(:,i) = gridF((a_p-da1'), r');
-         else
-             ff(:,i) = gridF((a_p-da1'));
-         end
+         ff(:,i)=interp2(r',Values_360r.Alpha,Values_360r.F,r',(a_p-da1'),'linear'); % linear inside loop for speed!!
 
 %       Determine fff same as original LB model, but with Tv
 % 

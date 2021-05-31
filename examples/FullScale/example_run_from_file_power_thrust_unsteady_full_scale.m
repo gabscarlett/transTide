@@ -32,8 +32,6 @@ run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 
 sim = TidalSim(run, foil); % pass the run settings class and aerofol class to simulator class
 
-sim.
-
 % TidalSim is the simulation class. It pulls everything together and runs the simulation. 
 % Model options and discretisation are controlled within.
 % Functions and methods to compute the flow field and loads
@@ -61,17 +59,18 @@ Thrust = sum(sim.Thrust); % sum the thrust contribution of each plade
 meanThrust = mean(Thrust); % compute the mean thrust
 
 
-%% re-run the simulation with rotational augmentation
+%% re-run with the unsteady load method
 
-sim.RotationalAugmentation = true; % set rotational augmentation property to true
+sim.LoadMethod = "Unsteady";
+sim.DSData = dsFile; % pass the path to the empirical data for the dynamic stall model
+
 sim.RunSimulation; % re-run the simulation
 
-Power_R = sum(sim.Power); % sum the power contribution of each blade
-meanPower_R = mean(Power_R); % compute the mean power
+Power_U = sum(sim.Power); % sum the power contribution of each blade
+meanPower_U = mean(Power_U); % compute the mean power
 
-Thrust_R = sum(sim.Thrust); % sum the thrust contribution of each blade
-meanThrust_R = mean(Thrust_R); % compute the mean thrust
-
+Thrust_U = sum(sim.Thrust); % sum the thrust contribution of each blade
+meanThrust_U = mean(Thrust_U); % compute the mean thrust
 
 %% plot the power and thrust time series for each method
 
@@ -81,13 +80,13 @@ figure;
 % plot power
 subplot(1,2,1)
 plot(t, Power/1000, 'b', t, meanPower/1000*(ones(size(t))), 'b:', ...
-    t, Power_R/1000, 'r', t, meanPower_R/1000*(ones(size(t))), 'r:', 'LineWidth',2)
+    t, Power_U/1000, 'r', t, meanPower_U/1000*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
 ylabel('Power [kW]')
-legend('Without rotation', 'mean','With rotation', 'mean', 'location', 'best')
+legend('Quasi-steady', 'mean','Unsteady', 'mean', 'location', 'best')
 % plot thrust
 subplot(1,2,2)
 plot(t, Thrust/1000, 'b', t, meanThrust/1000*(ones(size(t))), 'b:', ...
-    t, Thrust_R/1000, 'r', t, meanThrust_R/1000*(ones(size(t))), 'r:', 'LineWidth',2)
+    t, Thrust_U/1000, 'r', t, meanThrust_U/1000*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
 ylabel('Thrust [kN]')

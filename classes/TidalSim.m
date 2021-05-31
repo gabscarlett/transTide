@@ -7,16 +7,16 @@ classdef TidalSim < handle
     
     properties (Access = public)
         
-        BladeSections (1,1) {mustBeNumeric, mustBeInteger} = 100; % discretisation along the blade
+        BladeSections (1,1) {mustBeNumeric, mustBeInteger} = 100; % discretisation along the blade span
         Rotations (1,1) {mustBeNumeric, mustBeInteger} = 100; % number of rotor revolutions
         Steps (1,1){mustBeNumeric, mustBeInteger} = 72; % number of time steps per revolution
-        Run; % class containing the run conditions for the simulation
+        Run; % class containing run conditions for the simulation
         Seed = []; % random seed for turbulence model
-        AeroFoil; % class containing the aerofoil parameters for the simulation
+        AeroFoil; % class containing aerofoil static coefficients for the simulation
         RotationalAugmentation(1,1){mustBeNonnegative, mustBeNumericOrLogical, mustBeInteger, mustBeLessThanOrEqual(RotationalAugmentation,1)} = false;
         LoadMethod (1,1) string {mustBeMember(LoadMethod, ["Quasi-steady","Unsteady"])} = 'Quasi-steady'; % the loads can be computed by quasi-steady or unsteady methods
         Density = 1025; % fluid density
-        DSData; % path location of the empirical data to run the dynamic stall model (Unsteady load method)
+        DSData; % file path to empirical data for dynamic stall model (LoadMethod = 'Unsteady')
         
         
     end
@@ -159,7 +159,7 @@ classdef TidalSim < handle
                         ,obj.Run.Depth,z,(obj.Psi-obj.Phase(n)),obj.RadialCoords,obj.Run.TipSpeedRatio,obj.Run.HubVelocity,obj.Run.YawAngle);
                     obj.Run.Waves.WaveNumber = K;
                 else
-                    u_wave = zeros(size(U_Shear)); w_wave = u_wave;
+                    u_wave = zeros(size(U_shear)); w_wave = u_wave;
                 end
                 
                 
@@ -273,35 +273,36 @@ classdef TidalSim < handle
                        
         end % Compute quasi-steady blade coefficients
         
+        
         function [] = setUSBladeCoefficients(obj)
             
             % set gridded seperation point
             if obj.RotationalAugmentation
-                gridF = griddedInterpolant({obj.AeroCoeffs.Alpha, obj.RadialCoords}, obj.AeroCoeffs.F, 'spline');
+                gridF = griddedInterpolant({obj.AeroCoeffs.Alpha, obj.RadialCoords}, obj.AeroCoeffs.F, 'linear');
             else
-                gridF = griddedInterpolant(obj.AeroCoeffs.Alpha, obj.AeroCoeffs.F, 'spline');
+                gridF = griddedInterpolant(obj.AeroCoeffs.Alpha, obj.AeroCoeffs.F, 'linear');
             end
             
             % pass AoA history to indicial load model
             dt = obj.RotationPeriod/obj.Steps;  % time step;
             for n = 1:obj.Run.Blades
-                % Attached unsteady Cl
+                % Attached unsteady Cl solution
                 [Cl_us(n,:,:), Cl_c, Cl_nc, Ds, aE(n,:,:)] = wag(obj.BladeChord, dt, obj.Run.HubVelocity,...
                     squeeze(obj.AngleOfAttack(n,:,:)), obj.AeroFoil.ZeroLiftAngle, obj.AeroFoil.LinearLiftSlope);
                 
                 if isempty(obj.DSData)
                      error('Dynamic stall empirical data not set. Set the file path on DSData.')
                 end
-                % Dynamic stall solution
+                % Dynamic stall Cl solution
                 [~,~,Cl_US(n,:,:), Dvis, Cd_Ind, ff_3d(n,:,:), fff_3d(n,:,:), VortexTracker_3d(n,:,:)] =.....
-                    dynStall(obj.BladeTwist, obj.BladeChord, gridF, obj.RadialCoords, Cl_us(n,:,:), ...
+                    dynStall(obj.BladeTwist, obj.BladeChord, gridF, obj.RadialCoords, squeeze(Cl_us(n,:,:)), ...
                     Cl_c, Cl_nc, Ds, squeeze(aE(n,:,:)), squeeze(obj.AngleOfAttack(n,:,:)), obj.DSData);
                 
-                % DRAG ROTATIONAL
+                % Dynamic stall Cd solution
                 [Cd_US(n,:,:)] = dynStallCd(Dvis, Cd_Ind, obj.grid, squeeze(aE(n,:,:)), obj.RadialCoords, obj.AeroFoil.ZeroLiftDrag);
             end
             
-            obj.LiftCoeff = Cl_US; obj.DragCoeff = zeros(size(Cl_US));%Cd_US;
+            obj.LiftCoeff = Cl_US; obj.DragCoeff = Cd_US;
             
         end
         
