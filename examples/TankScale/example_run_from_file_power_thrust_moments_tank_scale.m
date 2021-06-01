@@ -30,6 +30,11 @@ foil = AerofoilProps(fileNameFoil);
 %% make a RunConditions class by passing the turbine file and operating file
 run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 
+%% adjust flow settings
+
+%run.Turbulence.On = 0; % switch off turbulence
+%run.Waves.On = 0; % switch off waves
+
 %% make a TidalSim class by passing the AerofoilProps and Runconditions class
 
 sim = TidalSim(run, foil); % pass the run settings class and aerofol class to simulator class
@@ -80,7 +85,7 @@ t = sim.Time; % get the time array
 
 figure;
 % plot power
-subplot(1,2,1)
+subplot(2,2,1)
 plot(t, RootBM, 'k', t, meanRootBM*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
 ylabel('Root bending moment [Nm]')

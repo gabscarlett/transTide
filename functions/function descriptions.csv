@@ -1,0 +1,16 @@
+Name,source,Description
+,,
+bladeEM,https://github.com/gabscarlett/transTide,Blade element momentum
+checkOptions,https://github.com/cmcnatt,Parses varargin options
+dynStall,https://github.com/gabscarlett/transTide,Dynamic stall model for lift coefficient
+dynStallCd,https://github.com/gabscarlett/transTide,Dynamic stall model for drag coefficient
+loads,https://github.com/gabscarlett/transTide,Helper function to compute global loads
+sepPoint,https://github.com/gabscarlett/transTide,Computes flow seperation points on blade section
+simps,http://www.biomecardio.com,Simpson's numerical integration
+stallDelay,https://github.com/gabscarlett/transTide,Applies stall delay due to blade rotation
+vitExtrapolation,https://github.com/gabscarlett/transTide,Viterna extrapolation
+vKSpec,https://github.com/gabscarlett/transTide,Synthetic von Karman turbulence spectrum
+wag,https://github.com/gabscarlett/transTide,Indicial lift coefficient for attached flow
+wavenumber,https://ww2.mathworks.cn/matlabcentral/fileexchange/40552-wavenumber-m?s_tid=prof_contriblnk,Solves linear dispersion with Doppler shift
+wavePv,https://github.com/gabscarlett/transTide,Wave particle velocities in time and space
+zero,https://people.sc.fsu.edu/~jburkardt/m_src/brent/brent.html,Brent Algorithm root finder
