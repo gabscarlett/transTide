@@ -1,6 +1,7 @@
 classdef RunConditions < handle
-    % RUNCONDITIONS: Sets the turbine run conditions for a tidal turbine
-    % geometry and operational conditions
+    % RUNCONDITIONS: Holds the run conditions for a tidal turbine
+    % simulation. The geometry (blade profile) and environmental 
+    % operating conditions are set
     
     % possible properties
     
@@ -16,8 +17,6 @@ classdef RunConditions < handle
         BladeTwist (1,:){mustBeNumeric, mustBeFinite}= []; % geometrical blade twist along the radius (radians)
                         
         BladeChord (1,:){mustBeNumeric, mustBeFinite} = []; % chord length along the radius
-        
-        TurbTab;
         
         Depth (1,1){mustBeNumeric, mustBeFinite}= 45 ; % water depth
         
@@ -37,7 +36,9 @@ classdef RunConditions < handle
         
         Turbulence = struct('On', 0, 'Spectrum', [], 'Intensity', [], 'LengthScale', [], 'IsotropyRatio', []);   % Structure containing the values for synthetic turbulence.
         
-        OperationsTab
+        OperationsTab; % matlab table holding raw file data
+        
+        TurbTab;
         
        
     

@@ -1,7 +1,7 @@
 classdef TidalSim < handle
-    % TIDALSIM: runs the turbine simulation for a given turbine
-    % geometry and operating conditions
-    % computes flow, loads, bending moments and power
+    % TIDALSIM: Runs a tidal turbine simulation for a given
+    % geometry and operating conditions.
+    % Computes flow, loads, bending moments and power.
     
     % possible properties
     

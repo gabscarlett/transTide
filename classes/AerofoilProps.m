@@ -1,25 +1,23 @@
 classdef AerofoilProps < handle
-    % AEROFOILPROPS: Given the coefficients for lift and drag with angle of
-    % attach computes normal and chordwise coefficients or vice verca and 
-    % extrapolates values to 360 angle range using the 
+    % AEROFOILPROPS: Holds the static aerofoil section properties for a simulation.
+    % Given the coefficients for lift and drag with angle of attack 
+    % the class computes normal and chordwise coefficients or vice verca 
+    % computes the static seperation point and extrapolates values to 360 deg. 
 
-    
-    % possible properties
-    
     properties (Access = public)
                
         
         AerofoilName (1,1) string = "none";
         
-        FoilTabData;
+        FoilTabData; % matlab table holding raw file data.
          
-        ZeroLiftAngle = 0; % angle of attack corresponding to Cl = 0;
+        ZeroLiftAngle (1,1){mustBeNumeric, mustBeFinite} = 0; % angle of attack corresponding to Cl = 0;
         
-        ZeroLiftDrag = 0; % drag coefficient for alpha(Cl = 0)
+        ZeroLiftDrag (1,1){mustBeNumeric, mustBeFinite} = 0; % drag coefficient for alpha(Cl = 0)
 
-        LinearClRange = deg2rad([-5, 5]) % range where Cl is linear with angle
+        LinearClRange (1,:){mustBeNumeric, mustBeFinite} = deg2rad([-5, 5]) % range where Cl is linear with angle
         
-        LinearLiftSlope = 2*pi; % slope in the linear Cl range
+        LinearLiftSlope (1,1){mustBeNumeric, mustBeFinite}= 2*pi; % slope in the linear Cl range
         
         AngleOfAttack (1,:){mustBeNumeric, mustBeFinite}= deg2rad(-5:0.1:5); % always in radians !!!
                         
@@ -65,7 +63,7 @@ classdef AerofoilProps < handle
             
             % set coefficients for the full 360 degree range
             obj.setDeepStallValues;
-            
+            % set the static seperation point
             obj.setSeperationPoint;
  
         end
