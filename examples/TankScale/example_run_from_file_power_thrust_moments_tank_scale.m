@@ -60,8 +60,8 @@ sim = TidalSim(run, foil); % pass the run settings class and aerofol class to si
 
 %% change discretisation settings
 
-% sim.BladeSections = 20; % for the tank scale device 20 sections are plenty
-% sim.Rotations = 50; % reduce the number of simulated rotations from 100 to 50
+sim.BladeSections = 20; % for the tank scale device 20 sections are plenty
+sim.Rotations = 50; % reduce the number of simulated rotations from 100 to 50
 
 %% run a simulation using default settings
 

@@ -32,8 +32,6 @@ run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 
 sim = TidalSim(run, foil); % pass the run settings class and aerofol class to simulator class
 
-sim.
-
 % TidalSim is the simulation class. It pulls everything together and runs the simulation. 
 % Model options and discretisation are controlled within.
 % Functions and methods to compute the flow field and loads
