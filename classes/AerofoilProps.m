@@ -80,7 +80,7 @@ classdef AerofoilProps < handle
         function [] = setSeperationPoint(obj)
             
             % Non-rotational separation point (-180 <-> 180)
-            obj.CoeffValues_360.F = sep_point(obj.CoeffValues_360.Alpha, obj.ZeroLiftAngle, obj.CoeffValues_360.Cn, ...
+            obj.CoeffValues_360.F = sepPoint(obj.CoeffValues_360.Alpha, obj.ZeroLiftAngle, obj.CoeffValues_360.Cn, ...
                 obj.LinearLiftSlope,obj.LinearClRange); 
             
         end
