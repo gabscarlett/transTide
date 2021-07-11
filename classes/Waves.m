@@ -15,17 +15,18 @@ classdef Waves < handle
         zCord(:,:){mustBeNumeric, mustBeFinite} = []; % depth position array
         Time(:,:){mustBeNumeric, mustBeFinite} = []; % simulation time array
         U0(1,1){mustBeNumeric, mustBeFinite}= 2; % streamwise current velocity;
-        W0(1,1){mustBeNumeric, mustBeFinite}= 0; % depthwise current velocity;;
+        W0(1,1){mustBeNumeric, mustBeFinite}= 0; % depthwise current velocity;
+        Seed = []; % random seed for irregular wave model
         
     end
     
     properties(SetAccess = private)
         
-        UVel;
-        WVel;
-        Spectrum;
-        Amplitudes;        
-        WaveNumber;
+        UVel(:,:){mustBeNumeric, mustBeFinite}; % streamwise wave particle velocities
+        WVel(:,:){mustBeNumeric, mustBeFinite}; % depthwise wave particle velocities;
+        Spectrum (1,:){mustBeNumeric, mustBeFinite}; % wave energy spectrum
+        Amplitudes (1,:){mustBeNumeric, mustBeFinite}; % wave amplitudes       
+        WaveNumber (1,:){mustBeNumeric, mustBeFinite}; % Apparant wave number (includes Doppler shift)
              
     end
     
@@ -48,7 +49,14 @@ classdef Waves < handle
             
             if strcmp('Irregular', obj.Type)
                 obj.makeSpectrum;
-                phase = (2*pi*rand(1, length(obj.Periods)));
+                % set or save seed for random number generator
+                if ~isempty(obj.Seed)
+                    rng(obj.Seed)
+                    phase = (2*pi*rand(1, length(obj.Periods))); % random phase
+                else
+                    phase = (2*pi*rand(1, length(obj.Periods))); % random phase
+                    obj.Seed = rng;
+                end
                 obj.computeVelocity(obj.Periods, 2*obj.Amplitudes, 'Phase', phase);
             end
             
@@ -66,6 +74,15 @@ classdef Waves < handle
             obj.Spectrum = coef./(w_r.^5).*exp(-5/4*(wp./w_r).^4);
             
             obj.Amplitudes = sqrt(2*obj.Spectrum.*abs(dw));%*length(obj.S);
+            
+        end
+        
+        function [] = plot(obj)
+            
+            figure;
+            plot(obj.Time, obj.UVel(5,:))
+            xlabel('Time [s]')
+            ylabel('Velocity [m/s]')
             
         end
         

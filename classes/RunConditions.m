@@ -32,7 +32,7 @@ classdef RunConditions < handle
         
         ShearLaw (1,1){mustBeNumeric, mustBeFinite}= 1/7 ; % exponent of shear velocity profile
         
-        Waves = struct('On', 0, 'Height', [], 'Period', [], 'Direction', []);   % Structure containing the values for wave generation.
+        Waves = struct('On', 0, 'Height', [], 'Period', [], 'Direction', [], 'Type', [], 'Model', [], 'Periods', []);   % Structure containing the values for wave generation.
         
         Turbulence = struct('On', 0, 'Spectrum', [], 'Intensity', [], 'LengthScale', [], 'IsotropyRatio', []);   % Structure containing the values for synthetic turbulence.
         
@@ -87,9 +87,14 @@ classdef RunConditions < handle
                 obj.Waves.On = opTab.waves(1);
                 if obj.Waves.On
                     % set the struct
+                    obj.Waves.Type = opTab.wave_type(1);
+                    obj.Waves.Model = opTab.wave_model(1);
                     obj.Waves.Height = opTab.wave_H(1);
                     obj.Waves.Period = opTab.wave_T(1);
                     obj.Waves.Direction = opTab.wave_dir(1);
+                    if strcmp(obj.Waves.Type, 'Irregular')
+                        obj.Waves.Periods = opTab.wave_period_range(1):opTab.wave_period_range(2):opTab.wave_period_range(3);
+                    end
                 end
                 obj.Turbulence.On = opTab.turbulence(1);
                 if obj.Turbulence.On

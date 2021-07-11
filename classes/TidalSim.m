@@ -11,7 +11,8 @@ classdef TidalSim < handle
         Rotations (1,1) {mustBeNumeric, mustBeInteger} = 100; % number of rotor revolutions
         Steps (1,1){mustBeNumeric, mustBeInteger} = 72; % number of time steps per revolution
         Run; % class containing run conditions for the simulation
-        Seed = []; % random seed for turbulence model
+        SeedTurbulence = []; % random seed for turbulence model
+        SeedWaves = []; % random seed for wave model
         AeroFoil; % class containing aerofoil static coefficients for the simulation
         RotationalAugmentation(1,1){mustBeNonnegative, mustBeNumericOrLogical, mustBeInteger, mustBeLessThanOrEqual(RotationalAugmentation,1)} = false;
         LoadMethod (1,1) string {mustBeMember(LoadMethod, ["Quasi-steady","Unsteady"])} = 'Quasi-steady'; % the loads can be computed by quasi-steady or unsteady methods
@@ -130,12 +131,12 @@ classdef TidalSim < handle
                     f',obj.Run.Turbulence.IsotropyRatio);% von Karmen PSD for [u,v,w] velocity fluctuations [ m^2/s]
                 
                 % set or save seed for random number generator             
-                if ~isempty(obj.Seed)
-                    rng(obj.Seed)
+                if ~isempty(obj.SeedTurbulence)
+                    rng(obj.SeedTurbulence)
                     psi = rand(size(Suvw))*2*pi; % random phase
                 else
                     psi = rand(size(Suvw))*2*pi; % random phase
-                    obj.Seed = rng;
+                    obj.SeedTurbulence = rng;
                 end
                                
                 % create velocity fluctuations
@@ -155,9 +156,30 @@ classdef TidalSim < handle
                 
                 if obj.Run.Waves.On
                     % TODO: seperate class for waves
-                    [u_wave(n,:,:),w_wave(n,:,:),K] = wavePV(obj.Run.Waves.Height,obj.Run.Waves.Period,obj.Run.Waves.Direction...
-                        ,obj.Run.Depth,z,(obj.Psi-obj.Phase(n)),obj.RadialCoords,obj.Run.TipSpeedRatio,obj.Run.HubVelocity,obj.Run.YawAngle);
-                    obj.Run.Waves.WaveNumber = K;
+                    wave = Waves;
+                    wave.Type = obj.Run.Waves.Type;
+                    wave.Model = obj.Run.Waves.Model;
+                    wave.Hs = obj.Run.Waves.Height;
+                    wave.Tp = obj.Run.Waves.Period;
+                    wave.Direction = obj.Run.Waves.Direction;
+                    wave.U0 = obj.Run.HubVelocity;
+                    wave.zCord = z;
+                    wave.Depth = obj.Run.Depth;
+                    
+                    if strcmp('Irregular', wave.Type)
+                        wave.Periods = obj.Run.Waves.Periods;
+                    end
+                    
+                    % time shift due to wave direction and/or yaw angle
+                    tX=obj.RadialCoords'.*sin(obj.Psi-obj.Phase(n))*sin(obj.Run.YawAngle + obj.Run.Waves.Direction)/abs(obj.Run.HubVelocity);      
+                    wave.Time = obj.Time + tX;
+                    wave.MakeWaves; % run wave model
+                    u_wave = wave.UVel; w_wave = wave.WVel; % get the wave partical velocity components
+                    obj.Run.Waves.WaveNumber = wave.WaveNumber;
+                    
+%                     [u_wave(n,:,:),w_wave(n,:,:),K] = wavePV(obj.Run.Waves.Height,obj.Run.Waves.Period,obj.Run.Waves.Direction...
+%                         ,obj.Run.Depth,z,(obj.Psi-obj.Phase(n)),obj.RadialCoords,obj.Run.TipSpeedRatio,obj.Run.HubVelocity,obj.Run.YawAngle);
+%                     obj.Run.Waves.WaveNumber = K;
                 else
                     u_wave = zeros(size(U_shear)); w_wave = u_wave;
                 end
