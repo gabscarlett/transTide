@@ -1,14 +1,14 @@
-depth,hub_depth,TSR,yaw,pitch,hub_velocity,shear_law,waves,wave_type,wave_model,wave_H,wave_T,wave_dir,wave_period_range,turbulence,turb_spec,turb_intensity,len_scale,iso_ratio
-2,-1,7,0,0.0262,0.81,0.066666667,1,Regular,Linear,0.1,2.5,0,,1,vk,0.08,0.2,1
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,, ,,
+depth,hub_depth,TSR,yaw,pitch,hub_velocity,shear_law,waves,wave_current,wave_type,wave_model,wave_H,wave_T,wave_dir,wave_period_range,turbulence,turb_spec,turb_intensity,len_scale,iso_ratio
+2,-1,7,0,0.0262,0.81,0.066666667,1,0,Regular,Linear,0.1,2.5,0,,1,vk,0.08,0.2,1
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,, ,,

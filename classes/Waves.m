@@ -6,6 +6,7 @@ classdef Waves < handle
     properties (Access = public)
         Type(1,1) string {mustBeMember(Type, ["Regular","Irregular"])} = 'Regular'; % wave type
         Model(1,1) string {mustBeMember(Model, ["Linear","Second"])} = 'Linear'; % wave model (linear wave theory or Stokes second order)
+        WaveCurrent(1,1){mustBeNonnegative, mustBeNumericOrLogical, mustBeInteger, mustBeLessThanOrEqual(WaveCurrent,1)} = false; % if true imposes doppler shift on wave
         Hs(1,1){mustBeNumeric, mustBeFinite}; % significant wave height
         Tp(1,1){mustBeNumeric, mustBeFinite}; % peak wave period
         Direction (1,1){mustBeNumeric, mustBeFinite}; % wave direction   
@@ -99,7 +100,11 @@ classdef Waves < handle
             
             % call wavenumber function to iterate for k
             tol=1E-10;     % iteration error
-            k = wavenumber(g, w_r,obj.Direction, obj.Depth, obj.U0, obj.W0, tol);
+            current = 0;
+            if obj.WaveCurrent
+                current = obj.U0;
+            end
+            k = wavenumber(g, w_r, obj.Direction, obj.Depth, current, obj.W0, tol);
             T_a=2*pi./sqrt(k.*g.*tanh(k.*obj.Depth));
             w_a = 2*pi./T_a; % doppler shifted frequency
             

@@ -24,10 +24,11 @@ hub_velocity,[m/s],Mean flow velocity at the hub centre
 shear_law,[-],Power law exponent for depthwise velocity profile
 ,,
 waves,[boolean],1 (true): waves are on; 0 (false): waves are off)
+wave_current,[boolean],1 (true): doppler shift on to superimpose current on wave number; 0 (false): wave-current off
 wave_type,[char],Regular: regular waves are modelled; Irregular: Irregular waves modeled from synthetic wave spectrum
 wave_model,[char],Linear: linear wave theory is used; Second: Stokes second order wave theory is used
-waves_H,[m],For regular waves this is the relative height for irregular waves is is the significant wave height
-wave_T,[s],For regular waves this is the relative wave period for irregular waves it is the peak wave period
+waves_H,[m],"For regular waves this is the relative height, for irregular waves it is the significant wave height"
+wave_T,[s],"For regular waves this is the relative wave period, for irregular waves it is the peak wave period"
 wave_dir,[rad],Wave direction relative to the freestream
 wave_periods,[s],Required for irregular waves. Provides the range of wave periods; element 1: shortest period; element 2: step size; element 3: longest period
 ,,

@@ -155,8 +155,8 @@ classdef TidalSim < handle
                 
                 
                 if obj.Run.Waves.On
-                    % TODO: seperate class for waves
-                    wave = Waves;
+                    wave = Waves; % make waves class
+                    wave.WaveCurrent = obj.Run.Waves.WaveCurrent;
                     wave.Type = obj.Run.Waves.Type;
                     wave.Model = obj.Run.Waves.Model;
                     wave.Hs = obj.Run.Waves.Height;
@@ -170,12 +170,19 @@ classdef TidalSim < handle
                         wave.Periods = obj.Run.Waves.Periods;
                     end
                     
+                    % set seed for random number generator   
+                    if ~isempty(obj.SeedWaves)
+                        wave.Seed = obj.SeedWaves;
+                    end
+                    
                     % time shift due to wave direction and/or yaw angle
                     tX=obj.RadialCoords'.*sin(obj.Psi-obj.Phase(n))*sin(obj.Run.YawAngle + obj.Run.Waves.Direction)/abs(obj.Run.HubVelocity);      
                     wave.Time = obj.Time + tX;
                     wave.MakeWaves; % run wave model
                     u_wave = wave.UVel; w_wave = wave.WVel; % get the wave partical velocity components
                     obj.Run.Waves.WaveNumber = wave.WaveNumber;
+                    obj.SeedWaves = wave.Seed;
+                    
                     
 %                     [u_wave(n,:,:),w_wave(n,:,:),K] = wavePV(obj.Run.Waves.Height,obj.Run.Waves.Period,obj.Run.Waves.Direction...
 %                         ,obj.Run.Depth,z,(obj.Psi-obj.Phase(n)),obj.RadialCoords,obj.Run.TipSpeedRatio,obj.Run.HubVelocity,obj.Run.YawAngle);
