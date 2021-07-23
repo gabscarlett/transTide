@@ -35,11 +35,12 @@ run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 
 %% adjust flow settings
 
-run.Turbulence.On = 0; % switch off turbulence
+%run.Turbulence.On = 0; % switch off turbulence
 %run.Waves.On = 0; % switch off waves
 
 run.Waves.Type = 'Irregular'; % other option is 'Regular'
-run.Waves.Model = 'Second'; % other option is 'Linear'
+%run.Waves.Model = 'Second'; % other option is 'Linear'
+
 run.Waves.H = 0.1; % if Irregular this is the significant wave height
 run.Waves.T = 2.5; % if Irregular this is the peak wave period
 run.Waves.Periods = 1:0.1:5; % range of wave periods to simulate for irregular waves only
@@ -119,3 +120,21 @@ subplot(1,2,2)
 plot(t, Thrust, 'k', t, meanThrust*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
 ylabel('Thrust [N]')
+
+%% access the seeds
+
+% the seeds used to generate random phases for turbulence and waves can be
+% accessed from the "sim" the TidalSim object.
+
+seedTurbulence = sim.SeedTurbulence; % seed used to generate turbulence phases
+
+seedWaves = sim.SeedWaves; % seed used to generate irregular wave phases
+
+% NOTE: These can be set prior to running your simulation
+% e.g...
+
+% #1 load your seed ... myTurbSeed/myWaveSeed
+% #2 set the seed/s...
+
+% sim.SeedTurbulence = myTurbSeed
+% sim.SeedWaves = myWaveSeed
