@@ -41,8 +41,8 @@ run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 run.Waves.Type = 'Irregular'; % other option is 'Regular'
 %run.Waves.Model = 'Second'; % other option is 'Linear'
 
-run.Waves.H = 0.1; % if Irregular this is the significant wave height
-run.Waves.T = 2.5; % if Irregular this is the peak wave period
+run.Waves.Height = 0.1; % if Irregular this is the significant wave height
+run.Waves.Period = 2.5; % if Irregular this is the peak wave period
 run.Waves.Periods = 1:0.1:5; % range of wave periods to simulate for irregular waves only
 
 %% make a TidalSim class by passing the AerofoilProps and Runconditions class
