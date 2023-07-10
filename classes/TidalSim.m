@@ -96,7 +96,6 @@ classdef TidalSim < handle
             obj.Psi = obj.Omega.*obj.Time;               % temporal azimuthal position (deg)
             
             % Spatial discretisation
-            obj.BladeSections = 100;                            % number of blade sections
             obj.RadialCoords = linspace(obj.Run.RadialCoord(1),obj.Run.RadialCoord(end),obj.BladeSections);      % radial coordinates (m)
             obj.BladeTwist = interp1(obj.Run.RadialCoord,obj.Run.BladeTwist,obj.RadialCoords,'PCHIP') + obj.Run.PitchAngle;       % gemoetrical twist + pitch (rad)
             obj.BladeChord = interp1(obj.Run.RadialCoord,obj.Run.BladeChord,obj.RadialCoords,'PCHIP');             % chord length (m)            
