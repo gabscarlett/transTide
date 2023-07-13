@@ -97,7 +97,7 @@ classdef TidalSim < handle
             
             % Spatial discretisation
             obj.RadialCoords = linspace(obj.Run.RadialCoord(1),obj.Run.RadialCoord(end),obj.BladeSections);      % radial coordinates (m)
-            obj.BladeTwist = interp1(obj.Run.RadialCoord,obj.Run.BladeTwist,obj.RadialCoords,'PCHIP') + obj.Run.PitchAngle;       % gemoetrical twist + pitch (rad)
+            obj.BladeTwist = interp1(obj.Run.RadialCoord,obj.Run.BladeTwist,obj.RadialCoords,'PCHIP');       % gemoetrical twist + pitch (rad)
             obj.BladeChord = interp1(obj.Run.RadialCoord,obj.Run.BladeChord,obj.RadialCoords,'PCHIP');             % chord length (m)            
             obj.Radius = (obj.RadialCoords(end));                             % radius of blade (m)
             
@@ -218,7 +218,7 @@ classdef TidalSim < handle
             % BEM induction calculation based on steady blade 1 only
             % (uniform current then yaw correction post solution)
             [a,ap] = bladeEM(obj.Run.HubVelocity,obj.Run.TipSpeedRatio,obj.Run.Blades,obj.RadialCoords,....
-                obj.BladeChord,obj.BladeTwist,obj.grid);
+                obj.BladeChord,(obj.BladeTwist + obj.Run.PitchAngle(1)),obj.grid);
             
             obj.AxialIndFactor = a;
             obj.TangentialIndFactor = ap;
@@ -238,10 +238,10 @@ classdef TidalSim < handle
                 Wrel(n,:,:) = sqrt((squeeze(obj.UAxial(n,:,:)).*(1-ak)).^2 + (squeeze(obj.UTangential(n,:,:)).*(1+ap_psi)).^2);
                 
                 % Angle of attack
-                AoA(n,:,:) = pi/2 - atan2(squeeze(obj.UTangential(n,:,:)).*(1+ap_psi),squeeze(obj.UAxial(n,:,:)).*(1-ak))-obj.BladeTwist';
+                AoA(n,:,:) = pi/2 - atan2(squeeze(obj.UTangential(n,:,:)).*(1+ap_psi),squeeze(obj.UAxial(n,:,:)).*(1-ak))-(obj.BladeTwist + obj.Run.PitchAngle(n))';
                 
                 % Flow angle
-                phi(n,:,:) = AoA(n,:,:) + obj.BladeTwist;
+                phi(n,:,:) = AoA(n,:,:) + (obj.BladeTwist+ obj.Run.PitchAngle(n));
                 
             end
             
@@ -257,7 +257,7 @@ classdef TidalSim < handle
             F=sepPoint(obj.AeroFoil.AngleOfAttack, obj.AeroFoil.ZeroLiftAngle,obj.AeroFoil.NormCoeff, ...
                 obj.AeroFoil.LinearLiftSlope, obj.AeroFoil.LinearClRange); % for rotational solution
             
-            [Cl_3d,Cd_3d,~,~] = stallDelay(obj.BladeTwist, obj.RadialCoords, obj.BladeChord, obj.AeroFoil.AngleOfAttack',F' ,...
+            [Cl_3d,Cd_3d,~,~] = stallDelay((obj.BladeTwist + obj.Run.PitchAngle(1)), obj.RadialCoords, obj.BladeChord, obj.AeroFoil.AngleOfAttack',F' ,...
                 obj.AeroFoil.LiftCoeff', obj.AeroFoil.DragCoeff', obj.AeroFoil.LinearLiftSlope, obj.AeroFoil.ZeroLiftAngle);
             
             % Deep stall applied to rotational values (-180 <-> 180)
@@ -323,7 +323,7 @@ classdef TidalSim < handle
                 end
                 % Dynamic stall Cl solution
                 [~,~,Cl_US(n,:,:), Dvis, Cd_Ind, ff_3d(n,:,:), fff_3d(n,:,:), VortexTracker_3d(n,:,:)] =.....
-                    dynStall(obj.BladeTwist, obj.BladeChord, gridF, obj.RadialCoords, squeeze(Cl_us(n,:,:)), ...
+                    dynStall((obj.BladeTwist + obj.Run.PitchAngle(1)), obj.BladeChord, gridF, obj.RadialCoords, squeeze(Cl_us(n,:,:)), ...
                     Cl_c, Cl_nc, Ds, squeeze(aE(n,:,:)), squeeze(obj.AngleOfAttack(n,:,:)), obj.DSData);
                 
                 % Dynamic stall Cd solution

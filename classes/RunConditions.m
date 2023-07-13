@@ -26,7 +26,9 @@ classdef RunConditions < handle
         
         YawAngle (1,1){mustBeNumeric, mustBeFinite}= 0 ; % angle of rotor with onset flow
         
-        PitchAngle (1,1){mustBeNumeric, mustBeFinite}= 0.017 ; % operational blade pitch angle (steady)
+        PitchAngle (1,:){mustBeNumeric, mustBeFinite}= [0.017, 0.017, 0.017]; % operational blade pitch angle (steady)
+
+        %PitchAngle (1,1){mustBeNumeric, mustBeFinite}= [0.017]; % operational blade pitch angle (steady)
         
         HubVelocity (1,1){mustBeNumeric, mustBeFinite}= 2.7 ; % steady/mean flow velocity at the hub centre
         
@@ -39,8 +41,7 @@ classdef RunConditions < handle
         OperationsTab; % matlab table holding raw file data
         
         TurbTab;
-        
-       
+          
     
     end
     
@@ -82,7 +83,16 @@ classdef RunConditions < handle
                 obj.HubDepth = opTab.hub_depth(1);
                 obj.TipSpeedRatio = opTab.TSR(1);
                 obj.YawAngle = opTab.yaw(1);
-                obj.PitchAngle = opTab.pitch(1);
+
+
+                if anynan(opTab.pitch(1:obj.Blades))
+                    error('Error. \nInputs for pitch angle cannot be NaN')
+                else
+                    for n=1:obj.Blades
+                        obj.PitchAngle(n) = opTab.pitch(n);
+                    end
+                end
+
                 obj.HubVelocity = opTab.hub_velocity(1);
                 obj.Waves.On = opTab.waves(1);
                 if obj.Waves.On

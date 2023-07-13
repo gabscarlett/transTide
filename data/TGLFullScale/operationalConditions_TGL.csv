@@ -1,2 +1,4 @@
 depth,hub_depth,TSR,yaw,pitch,hub_velocity,shear_law,waves,wave_current,wave_type,wave_model,wave_H,wave_T,wave_dir,wave_period_range,turbulence,turb_spec,turb_intensity,len_scale,iso_ratio
 45,-26,4.5,0,0.017,2.7,0.142857143,1,0,Regular,Linear,4,10,0,,1,vk,0.1,15,1
+,,,,0.017,,,,,,,,,,,,,,,
+,,,,0.017,,,,,,,,,,,,,,,
