@@ -11,13 +11,14 @@ classdef Waves < handle
         Tp(1,1){mustBeNumeric, mustBeFinite}; % peak wave period
         Direction (1,1){mustBeNumeric, mustBeFinite}; % wave direction   
         Periods (1,:){mustBeNumeric, mustBeFinite} = []; % relative wave period array for irregular waves
-        Spectra(1,1) string {mustBeMember(Spectra, ["Bretschnider","Jonswap"])} = 'Bretschnider'; % wave type;
+        SpectraType(1,1) string {mustBeMember(SpectraType, ["Bretschnider","JONSWAP","Input"])} = 'Bretschnider'; % wave type;
         Depth (1,1){mustBeNumeric, mustBeFinite}= 45; % water depth
         zCord(:,:){mustBeNumeric, mustBeFinite} = []; % depth position array
         Time(:,:){mustBeNumeric, mustBeFinite} = []; % simulation time array
         U0(1,1){mustBeNumeric, mustBeFinite}= 2; % streamwise current velocity;
         W0(1,1){mustBeNumeric, mustBeFinite}= 0; % depthwise current velocity;
         Seed = []; % random seed for irregular wave model
+        Spectrum (1,:){mustBeNumeric, mustBeFinite}; % wave energy spectrum
         
     end
     
@@ -25,7 +26,6 @@ classdef Waves < handle
         
         UVel(:,:){mustBeNumeric, mustBeFinite}; % streamwise wave particle velocities
         WVel(:,:){mustBeNumeric, mustBeFinite}; % depthwise wave particle velocities;
-        Spectrum (1,:){mustBeNumeric, mustBeFinite}; % wave energy spectrum
         Amplitudes (1,:){mustBeNumeric, mustBeFinite}; % wave amplitudes       
         WaveNumber (1,:){mustBeNumeric, mustBeFinite}; % Apparant wave number (includes Doppler shift)
              
@@ -64,18 +64,44 @@ classdef Waves < handle
             
         end
         
-        function [obj] = makeSpectrum(obj)
-            
+        function [obj] = makeSpectrum(obj, varargin)
+
             w_r = 2*pi./obj.Periods;
             dw = w_r(2:end) - w_r(1:end-1);
             dw(end+1) = dw(end);   
-            
             wp = 2*pi./obj.Tp;
+
+            if strcmp('Bretschnider', obj.SpectraType)
+            
+            % Bretschnider 
+            % use for fully developed seas
+            
             coef = 5/16*wp^4*obj.Hs^2;          
             obj.Spectrum = coef./(w_r.^5).*exp(-5/4*(wp./w_r).^4);
+
+            elseif strcmp('JONSWAP', obj.SpectraType)
+
+            % JONSWAP 
+            % use for local storm generated seas (technically the North Sea)
             
-            obj.Amplitudes = sqrt(2*obj.Spectrum.*abs(dw));%*length(obj.S);
+            % tuning parameters are hardcoded (do not use lightly!)
+            sigmaA = 0.07;
+            sigmaB = 0.09;
+            gamma = 3.3;
+
+            sigma = (w_r<=wp)*sigmaA+(w_r>wp)*sigmaB;
+            b = exp(-((w_r - wp).^2)./(2*(sigma.^2)*(wp.^2)));         
+            coef = 0.0081*(9.81^2)./w_r.^5;
+            obj.Spectrum = coef.*exp(-5.4.*(wp./w_r).^4).*(gamma.^b); % 
+
+            else % must be user defined spectrum (SpectraType = Input)
+                 % lets check the spectum has been set
+                 if isempty(obj.Spectrum)
+                    error('Error. \nInputs Spectrum for SpectraType "Input" cannot be empty')
+                 end
+            end
             
+            obj.Amplitudes = sqrt(2*obj.Spectrum.*abs(dw));       
         end
         
         function [] = plot(obj)

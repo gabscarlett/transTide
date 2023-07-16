@@ -48,6 +48,7 @@ classdef TidalSim < handle
         EdgeBM; % Edgewise bending moment time series for each blade
         Power; % Power time series for each blade
         Thrust; % Thrust time series for each blade
+        WaveClass; % Waves class instance
     end
     
     properties(Access = private)
@@ -167,6 +168,13 @@ classdef TidalSim < handle
                     
                     if strcmp('Irregular', wave.Type)
                         wave.Periods = obj.Run.Waves.Periods;
+                        if ~isempty(obj.Run.Waves.Spectrum)
+                            % set user defined spectum
+                            wave.Spectrum = obj.Run.Waves.Spectrum;
+                            wave.SpectraType = "Input";
+                        end
+                        wave.SpectraType = obj.Run.Waves.SpectraType;
+
                     end
                     
                     % set seed for random number generator   
@@ -181,11 +189,8 @@ classdef TidalSim < handle
                     u_wave = wave.UVel; w_wave = wave.WVel; % get the wave partical velocity components
                     obj.Run.Waves.WaveNumber = wave.WaveNumber;
                     obj.SeedWaves = wave.Seed;
-                    
-                    
-%                     [u_wave(n,:,:),w_wave(n,:,:),K] = wavePV(obj.Run.Waves.Height,obj.Run.Waves.Period,obj.Run.Waves.Direction...
-%                         ,obj.Run.Depth,z,(obj.Psi-obj.Phase(n)),obj.RadialCoords,obj.Run.TipSpeedRatio,obj.Run.HubVelocity,obj.Run.YawAngle);
-%                     obj.Run.Waves.WaveNumber = K;
+                    obj.WaveClass = wave; % set the class instance for postr processing
+                                       
                 else
                     u_wave = zeros(size(U_shear)); w_wave = u_wave;
                 end
