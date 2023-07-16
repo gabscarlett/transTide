@@ -33,18 +33,26 @@ run = RunConditions('turbine file',fileNameTurb, 'operating file', fileNameOps);
 % to find out what RunConditions does use help
 % help RunConditions
 
-%% adjust flow settings
+%% adjust flow settings to input user defined wave PSD
 
 %run.Turbulence.On = 0; % switch off turbulence
 %run.Waves.On = 0; % switch off waves
 
 run.Waves.Type = 'Irregular'; % other option is 'Regular'
-run.Waves.SpectraType = 'JONSWAP'; % Bretschnider of JONSWAP can be synthesized
-%run.Waves.Model = 'Second'; % other option is 'Linear'
+run.Waves.SpectraType = 'Input'; % Bretschnider of JONSWAP can be synthesized
 
-run.Waves.Height = 0.1; % if Irregular this is the significant wave height
-run.Waves.Period = 2.5; % if Irregular this is the peak wave period
-run.Waves.Periods = 1:0.1:5; % range of wave periods to simulate for irregular waves only
+% load wave spectrum from file
+specTab = readtable([myPath 'fitted_spectra.xlsx'],'Sheet','Spectrum'); % Power spectral density of FloWave
+
+% set case1 from specTab
+run.Waves.Spectrum = specTab.Case1;
+
+% no need to set Hs and Tp (these are implicit in the spectrum and can be
+% derived from spectral moments)
+
+% run.Waves.Height = 0.1; % if Irregular this is the significant wave height
+% run.Waves.Period = 2.5; % if Irregular this is the peak wave period
+run.Waves.Periods = 1./[0.2:0.01:2]; % range of wave periods to simulate for irregular waves only
 
 %% make a TidalSim class by passing the AerofoilProps and Runconditions class
 
@@ -71,23 +79,50 @@ sim = TidalSim(run, foil); % pass the run settings class and aerofol class to si
 sim.BladeSections = 20; % for the tank scale device 20 sections are plenty
 sim.Rotations = 50; % reduce the number of simulated rotations from 100 to 50
 
-%% run a simulation using default settings
+%% run a simulation and inspect waves
 
 sim.RunSimulation; % run the simulation
 
-blade = 1; % blade number to inspect
+wave = sim.WaveClass;
 
-RootBM = sim.RootBM(blade,:); % root bending moment time series for blade 
-meanRootBM = mean(RootBM); % compute the mean root bending moment
+% blade = 1; % blade number to inspect
+% 
+% RootBM = sim.RootBM(blade,:); % root bending moment time series for blade 
+% meanRootBM = mean(RootBM); % compute the mean root bending moment
+% 
+% EdgeBM = sim.EdgeBM(blade,:); % root bending moment time series for blade 
+% meanEdgeBM = mean(EdgeBM); % compute the mean root bending moment
+% 
+% Power = sum(sim.Power); % sum the power contribution of each plade
+% meanPower = mean(Power); % compute the mean power
+% 
+% Thrust = sum(sim.Thrust); % sum the thrust contribution of each plade
+% meanThrust = mean(Thrust); % compute the mean thrust
 
-EdgeBM = sim.EdgeBM(blade,:); % root bending moment time series for blade 
-meanEdgeBM = mean(EdgeBM); % compute the mean root bending moment
+pos = 10;
+figure;
+plot(wave.Time, wave.UVel(pos,:),'b')
+hold on
+%plot(wave.Time, wave.WVel(pos,:), 'r')
+xlabel('Time [s]')
+ylabel('Velocity [m/s]')
 
-Power = sum(sim.Power); % sum the power contribution of each plade
-meanPower = mean(Power); % compute the mean power
+%% play with the seed
 
-Thrust = sum(sim.Thrust); % sum the thrust contribution of each plade
-meanThrust = mean(Thrust); % compute the mean thrust
+% if we run again the seed is set so it will automatically
+% be applied and the traces will match
+
+wave.MakeWaves; % reset
+% add the new plot
+plot(wave.Time, wave.UVel(pos,:),'r--') % this should match (seed unchanged)
+hold on
+
+% lets change the seed
+seed = wave.Seed;
+wave.Seed = rng(101);
+wave.MakeWaves;
+plot(wave.Time, wave.UVel(pos,:),'k:') % this should not match (seed changed)
+hold on
 
 
 %% plot the bending moment time series
