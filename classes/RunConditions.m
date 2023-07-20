@@ -94,6 +94,7 @@ classdef RunConditions < handle
                 end
 
                 obj.HubVelocity = opTab.hub_velocity(1);
+                obj.ShearLaw = opTab.shear_law(1);
                 obj.Waves.On = opTab.waves(1);
                 if obj.Waves.On
                     % set the struct
