@@ -92,9 +92,43 @@ FT = sim.ForceTangential(blade,:,:);
 
 for n = 2:length(r)-1 % integrate along the blade in increments (dr) from the root to the tip
 
+    MY_rt(n,:)=simps(r(1:n),FN(:,1:n,:).*(r(1:n)-r(1)));                % root bending (N m)
+    MX_rt(n,:)=simps(r(1:n),FT(:,1:n,:).*(r(1:n)-r(1)));                % edgewise bending (N m)
+
+end
+
+FN= flip(FN,2); FT = flip(FT,2); % flip the order of the forces
+
+% we don't need to flip the order of the radial coordinates because the
+% spatial discretisation if uniform.
+
+for n = 2:length(r)-1 % integrate along the blade in increments (dr) from the tip to the root
+
     MY(n,:)=simps(r(1:n),FN(:,1:n,:).*(r(1:n)-r(1)));                % root bending (N m)
     MX(n,:)=simps(r(1:n),FT(:,1:n,:).*(r(1:n)-r(1)));                % edgewise bending (N m)
 
 end
 
-% plot the summarry statistics
+MY_tr = flip(MY,1); MX_tr = flip(MX,1); % flip the order to plot along the blade
+
+% plot the means
+R = r(1:end-1);
+figure;
+subplot(1,2,1)
+plot(R, mean(MY_rt,2), 'r', 'LineWidth',2)
+hold on
+plot(R, mean(MY_tr,2), 'b', 'LineWidth',2)
+xlabel('Blade coordinate [m]')
+ylabel('Mean root bending moment [kNm]')
+%
+subplot(1,2,2)
+plot(R, mean(MX_rt,2), 'r', 'LineWidth',2)
+hold on
+plot(R, mean(MX_tr,2), 'b', 'LineWidth',2)
+xlabel('Blade coordinate [m]')
+ylabel('Mean edgewise bending moment [kNm]')
+%
+legend('Counter clockwise', 'Clockwise')
+
+% save the plot
+print([transTidePath '\plots\meanBladeBending'],'-dpng','-r350');
