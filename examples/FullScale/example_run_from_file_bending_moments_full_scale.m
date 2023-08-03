@@ -81,3 +81,20 @@ subplot(1,2,2)
 plot(t, EdgeBM/1000, 'k', t, meanEdgeBM/1000*(ones(size(t))), 'r:', 'LineWidth',2)
 xlabel('Time [s]')
 ylabel('Edge wise bending moment [kNm]')
+
+%% inspect the bending moments along the blade span
+
+blade = 1; % blade number to inspect
+
+r = sim.RadialCoords;
+FN = sim.ForceNormal(blade,:,:);
+FT = sim.ForceTangential(blade,:,:);
+
+for n = 2:length(r)-1 % integrate along the blade in increments (dr) from the root to the tip
+
+    MY(n,:)=simps(r(1:n),FN(:,1:n,:).*(r(1:n)-r(1)));                % root bending (N m)
+    MX(n,:)=simps(r(1:n),FT(:,1:n,:).*(r(1:n)-r(1)));                % edgewise bending (N m)
+
+end
+
+% plot the summarry statistics
