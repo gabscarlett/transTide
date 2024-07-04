@@ -4,10 +4,8 @@ clear; close all; clc
 % Input data for the turbine, aerofoil and operating conditions are loaded from
 % from a csv file.
 
-% Altering default discretisation settings is demonstrated.
-
-% An example is given to compute the root and edge wise bending moments,
-% and to plot them for a single blade.
+% An example is given to make a pitch time series and to set it on the
+% class as a piutch control input
 
 %% set the paths and file names
 myPath = [transTidePath '\data\TGLFullScale\']; % this is the data path
@@ -61,18 +59,18 @@ sim.Rotations = 5; % reduce the number of simulated rotations from 100 to 50
 
 sim.RunSimulation; % run the simulation
 
-Power_0 = sum(sim.Power); % sum the power contribution of each plade
+Power_0 = sum(sim.Power); % sum the power contribution of each blade
 meanPower_0 = mean(Power_0); % compute the mean power
 
-Thrust_0 = sum(sim.Thrust); % sum the thrust contribution of each plade
+Thrust_0 = sum(sim.Thrust); % sum the thrust contribution of each blade
 meanThrust_0 = mean(Thrust_0); % compute the mean thrust
 
 meanThrust_0/1000; % print the mean thrust in kN
 
 %% apply pitch control and rerun
 
-% This example inputs a sinusoidal dynamic pitch. This is in addition to
-% the static pitch.
+% This example inputs a sinusoidal dynamic pitch. 
+% NOTE: This is in addition to the static pitch (offset).
 
 % get the time array
 t = sim.Time; % get the time array
@@ -97,10 +95,10 @@ sim.PitchControl.Pitch = pitchDyn;
 
 sim.RunSimulation; % run the simulation
 
-Power_p = sum(sim.Power); % sum the power contribution of each plade
+Power_p = sum(sim.Power); % sum the power contribution of each blade
 meanPower_p = mean(Power_p); % compute the mean power
 
-Thrust_p = sum(sim.Thrust); % sum the thrust contribution of each plade
+Thrust_p = sum(sim.Thrust); % sum the thrust contribution of each blade
 meanThrust_p = mean(Thrust_p); % compute the mean thrust
 
 meanThrust_p/1000; % print the mean thrust in kN

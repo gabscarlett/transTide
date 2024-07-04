@@ -238,6 +238,15 @@ classdef TidalSim < handle
             if obj.PitchControl.On
                 % obj.PitchControl.Pitch is the dynamic pitch angle: f(t) 
                 % it should be size(length(obj.Phase), length(obj.Time))
+
+                % validate pictch input to check for errors
+                classes = {'numeric'};
+                attributes = {'size',[length(obj.Phase),length(obj.Time)]};
+                try
+                 validateattributes(obj.PitchControl.Pitch, classes, attributes)
+                catch
+                    error('The dynamic pitch must be numerical and have dimensions: size(length(obj.Phase), length(obj.Time)).')
+                end
                 pitch = obj.PitchControl.Pitch + obj.Run.PitchAngle';
             else
                 %pitch = ones(length(obj.Thrust), obj.Phase) * obj.Run.PitchAngle;
