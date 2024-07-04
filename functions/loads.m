@@ -11,7 +11,7 @@ function [MY,MX,T,P,FN,FT]=loads(F,Cl,Cd,phi,r,omega)
     % single blade
     % Determines the power contribution of the blade
 
-    CN=Cl.*cos(phi);%$+Cd.*sin(phi);      % Normal to rotor plane
+    CN=Cl.*cos(phi)+Cd.*sin(phi);      % Normal to rotor plane
     CT=Cl.*sin(phi)-Cd.*cos(phi);      % Tangential to rotor plane
     
     FN=F.*CN;                          % distributed normal load N/m

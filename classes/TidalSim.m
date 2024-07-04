@@ -18,6 +18,7 @@ classdef TidalSim < handle
         LoadMethod (1,1) string {mustBeMember(LoadMethod, ["Quasi-steady","Unsteady"])} = 'Quasi-steady'; % the loads can be computed by quasi-steady or unsteady methods
         Density = 1025; % fluid density
         DSData; % file path to empirical data for dynamic stall model (LoadMethod = 'Unsteady')
+        PitchControl = struct('On', 0, 'Pitch', []);   % Structure to switch on and apply pitch control.
         
         
     end
@@ -232,6 +233,17 @@ classdef TidalSim < handle
             a_psi = a'.*ones(size(obj.Psi));
             chi=(0.6.*ap_psi+1)*obj.Run.YawAngle;       % wake skew angle
             Mu = obj.RadialCoords/obj.Radius;
+
+            % Pitch control
+            if obj.PitchControl.On
+                % obj.PitchControl.Pitch is the dynamic pitch angle: f(t) 
+                % it should be size(length(obj.Phase), length(obj.Time))
+                pitch = obj.PitchControl.Pitch + obj.Run.PitchAngle; % DO SOMETHING
+            else
+                %pitch = ones(length(obj.Thrust), obj.Phase) * obj.Run.PitchAngle;
+                pitch = ones(length(obj.Phase), length(obj.Time)) .* obj.Run.PitchAngle';
+
+            end
             
             for n = 1:obj.Run.Blades
                 % yaw correction to axial induction factor to give azimuthal variation
@@ -243,10 +255,12 @@ classdef TidalSim < handle
                 Wrel(n,:,:) = sqrt((squeeze(obj.UAxial(n,:,:)).*(1-ak)).^2 + (squeeze(obj.UTangential(n,:,:)).*(1+ap_psi)).^2);
                 
                 % Angle of attack
-                AoA(n,:,:) = pi/2 - atan2(squeeze(obj.UTangential(n,:,:)).*(1+ap_psi),squeeze(obj.UAxial(n,:,:)).*(1-ak))-(obj.BladeTwist + obj.Run.PitchAngle(n))';
+                %AoA(n,:,:) = pi/2 - atan2(squeeze(obj.UTangential(n,:,:)).*(1+ap_psi),squeeze(obj.UAxial(n,:,:)).*(1-ak))-(obj.BladeTwist + obj.Run.PitchAngle(n))';
+                AoA(n,:,:) = (pi/2 - atan2(squeeze(obj.UTangential(n,:,:)).*(1+ap_psi),squeeze(obj.UAxial(n,:,:)).*(1-ak))) - pitch(n,:) - obj.BladeTwist';
                 
                 % Flow angle
-                phi(n,:,:) = AoA(n,:,:) + (obj.BladeTwist+ obj.Run.PitchAngle(n));
+                phi(n,:,:) = AoA(n,:,:) + (obj.BladeTwist + obj.Run.PitchAngle(n));
+                phi(n,:,:) = squeeze(AoA(n,:,:)) + pitch(n,:) + obj.BladeTwist';
                 
             end
             
