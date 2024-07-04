@@ -8,7 +8,7 @@ classdef TidalSim < handle
     properties (Access = public)
         
         BladeSections (1,1) {mustBeNumeric, mustBeInteger} = 100; % discretisation along the blade span
-        Rotations (1,1) {mustBeNumeric, mustBeInteger} = 100; % number of rotor revolutions
+        Rotations (1,1) {mustBeNumeric, mustBeFinite} = 100; % number of rotor revolutions
         Steps (1,1){mustBeNumeric, mustBeInteger} = 72; % number of time steps per revolution
         Run; % class containing run conditions for the simulation
         SeedTurbulence = []; % random seed for turbulence model
@@ -94,7 +94,7 @@ classdef TidalSim < handle
             
             % Temporal discretisation
             dt=obj.RotationPeriod/obj.Steps;                   % time step;
-            obj.Time = 0:dt:obj.Rotations*obj.RotationPeriod - dt;        % time (s)
+            obj.Time = 0:dt:(obj.Rotations + 1)*obj.RotationPeriod - dt;        % time (s)
             obj.Psi = obj.Omega.*obj.Time;               % temporal azimuthal position (deg)
             
             % Spatial discretisation
@@ -238,7 +238,7 @@ classdef TidalSim < handle
             if obj.PitchControl.On
                 % obj.PitchControl.Pitch is the dynamic pitch angle: f(t) 
                 % it should be size(length(obj.Phase), length(obj.Time))
-                pitch = obj.PitchControl.Pitch + obj.Run.PitchAngle; % DO SOMETHING
+                pitch = obj.PitchControl.Pitch + obj.Run.PitchAngle';
             else
                 %pitch = ones(length(obj.Thrust), obj.Phase) * obj.Run.PitchAngle;
                 pitch = ones(length(obj.Phase), length(obj.Time)) .* obj.Run.PitchAngle';
