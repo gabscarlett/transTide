@@ -3,9 +3,9 @@
 ![MATLAB](https://img.shields.io/badge/MATLAB-R2016b%2B-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-**transTide** is a low-order numerical model developed to investigate how unsteady flow: including waves, turbulence, and shear—leads to load and power fluctuations on tidal turbine blades. 
+**transTide** is a low-order numerical model developed to investigate how unsteady flow: including waves, turbulence, and shear, leads to load and power fluctuations on tidal turbine rotors. 
 
-🌟 **A First in Tidal Energy Research:** This project represents the **first work to utilize measured ADCP (Acoustic Doppler Current Profiler) data as a direct spanwise input** for quantifying unsteady hydrodynamics on full-scale rotors, setting it apart from standard BEM solvers.
+🌟 **A First in Tidal Energy Research:** This project represents the **first work to utilise measured ADCP (Acoustic Doppler Current Profiler) data as a direct spanwise input** for quantifying unsteady hydrodynamics on full-scale rotors, setting it apart from standard BEM solvers.
 
 ## 🌊 Key Features
 * **Coupled Physics:** Integrates Blade-Element Momentum (BEM) with attached flow, separated flow, and rotational augmentation.
@@ -21,18 +21,26 @@
 
 ### 1. Root Bending Moment Validation
 The model accurately predicts root bending moments during combined wave and turbulence loading, showing excellent agreement with measured tank-scale data.
+
 ![Validation Plot](images/validation-fig7-4.png)
-*(Placeholder: Add Figure 7.4 from Thesis showing measured vs. predicted root bending moments)*
+*(Figure 7.4 from Thesis)*
+
+The unsteady constituents to the root bending moments are identified in the frequency domain by producing an amplitude spectrum over many periods of revolution.
+
+![Validation Plot](images/validation-fig7-6.png)
+*(Figure 7.4 from Thesis)*
 
 ### 2. Leading-Edge Vortex Shedding
-`transTide` captures the highly non-linear build-up and transit of the leading-edge vortex during dynamic stall.
+`transTide` can capture the highly non-linear build-up and transit of the leading-edge vortex during dynamic stall.
+
 ![Vortex Shedding Traces](images/vortex-shedding-fig9-13.png)
-*(Placeholder: Add Figure 9.13 from Thesis)*
+*(Figure 9.13 from Thesis)*
 
 ### 3. Spanwise Separation Mapping
-Contour mapping of unsteady hydrodynamics along the blade span during large wave conditions.
+Unsteady hydrodynamics along the blade span during, (a) turbulence and yaw, (b) waves and yaw, (c) waves, turbulence and yaw and (d) waves and turbulence.
+
 ![Spanwise Unsteadiness](images/spanwise-fig8-22.png)
-*(Placeholder: Add Figure 8.22 from Thesis)*
+*(Figure 8.22 from Thesis)*
 
 ---
 
@@ -47,7 +55,7 @@ Contour mapping of unsteady hydrodynamics along the blade span during large wave
 
 This codebase was developed by **Dr. Gabriel Thomas Scarlett** in support of his PhD at **The University of Edinburgh** (2015–2018), under the supervision of **Dr. Ignazio Maria Viola**. 
 
-The work was conducted in the context of the **ReDAPT (Reliable Data Acquisition Platform for Tidal)** project, and the methods developed here continue to be utilized by researchers analyzing unsteady tidal hydrodynamics.
+The work was conducted in the context of the **ReDAPT (Reliable Data Acquisition Platform for Tidal)** project, and the methods developed here continue to be utilised by researchers analysing unsteady tidal hydrodynamics.
 
 ### Publications
 If you use `transTide` in your research, please consider citing the foundational thesis or relevant journal papers:
@@ -56,7 +64,7 @@ If you use `transTide` in your research, please consider citing the foundational
 * Scarlett, G. T. (2018). *Unsteady Hydrodynamics of Tidal Turbine Blades*. The University of Edinburgh. [Available here (Edinburgh Research Archive)](https://era.ed.ac.uk/items/e9f86e9f-7dff-4d6a-b45a-11378efde862)
 
 **Journal Papers:**
-1. Scarlett, G.T., et al. (2019). "Unsteady hydrodynamics of a full-scale tidal turbine operating in large wave conditions," *Renewable Energy*. [DOI: https://doi.org/10.1016/j.renene.2019.06.153]
+1. Scarlett, G.T., et al. (2019). "Unsteady hydrodynamics of a full-scale tidal turbine operating in large wave conditions," *Renewable Energy*. [DOI: https://doi.org/10.1016/j.renene.2019.04.123]
 2. Scarlett, G. T., & Viola, I. M. (2020). Unsteady hydrodynamics of tidal turbine blades," *Renewable Energy*. [DOI: https://doi.org/10.1016/j.renene.2019.06.153]
 
 
